@@ -1,0 +1,18 @@
+# Ignore virtual environment directories
+venv/
+env/
+.env/
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore conversations directory (user data)
+conversations/
+
+# Ignore other OS-specific or editor-specific files
+.DS_Store
+*.swp
+*.sublime-project
+*.sublime-workspace
+.vscode/
