@@ -71,9 +71,12 @@ This Streamlit app allows users to analyze images using the Ollama Vision Model,
     ```bash
     ollama serve
     ```
-   Tip: Keep this terminal window open as the server needs to run continuously. You may open a new terminal window for the next steps.
+   Tips:
+   
+   - Keep this terminal window open as the server needs to run continuously. You may open a new terminal window for the next steps.
+   - Also, in Windows, you will need to exit any instance of Ollama running in the taskbar.
 
-8. **Launch the App**:
+9. **Launch the App**:
 
    - In a new terminal window (with your virtual environment activated), navigate to the project directory if you're not already there:
      
