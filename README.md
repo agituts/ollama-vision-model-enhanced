@@ -13,7 +13,7 @@ This Streamlit app allows users to analyze images using the Ollama Vision Model,
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/amaxkeylogger/ollama-vision-model-enhanced.git
+    git clone https://github.com/agituts/ollama-vision-model-enhanced.git
     cd ollama-vision-model-enhanced
     ```
 
