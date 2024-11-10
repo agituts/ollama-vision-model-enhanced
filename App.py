@@ -11,10 +11,11 @@ def delete_conversation(filename):
     json_path = os.path.join('conversations', filename)
     if os.path.exists(json_path):
         os.remove(json_path)
-    
+        
     # Extract timestamp from filename
     base_filename = os.path.basename(filename)
     timestamp = base_filename.replace('conversation_', '').replace('.json', '')
+    
     # Delete associated image files
     image_extensions = ['png', 'jpg', 'jpeg']
     for ext in image_extensions:
@@ -22,13 +23,24 @@ def delete_conversation(filename):
         image_path = os.path.join('conversations', image_filename)
         if os.path.exists(image_path):
             os.remove(image_path)
-    
-    # Also delete current_conversation.json if it matches
-    if os.path.exists('conversations/current_conversation.json'):
-        with open('conversations/current_conversation.json', 'r') as f:
-            current_data = json.load(f)
+            
+    # Handle current_conversation.json
+    current_conv_path = 'conversations/current_conversation.json'
+    if os.path.exists(current_conv_path):
+        try:
+            with open(current_conv_path, 'r') as f:
+                current_data = json.load(f)
+            f.close()  # Explicitly close the file
+            
             if current_data.get('timestamp') == timestamp:
-                os.remove('conversations/current_conversation.json')
+                try:
+                    os.remove(current_conv_path)
+                except PermissionError:
+                    import time
+                    time.sleep(0.1)  # Add small delay
+                    os.remove(current_conv_path)
+        except Exception as e:
+            print(f"Error handling current_conversation.json: {e}")
 
 def save_conversation(messages, context, image=None, filename=None, title=None):
     if not messages:
@@ -276,6 +288,8 @@ def main():
         st.session_state.edit_title_target = ''
     if 'new_title' not in st.session_state:
         st.session_state.new_title = ''
+    if 'edit_button_states' not in st.session_state:
+        st.session_state.edit_button_states = {}
 
     # Attempt to load current conversation if it exists
     if os.path.exists('conversations/current_conversation.json') and not st.session_state.messages:
@@ -388,10 +402,21 @@ def main():
                                         st.session_state.load_conversation_filename = conv['filename']
                                         st.rerun()
                                 with col_icon2:
+                                    # Initialize button state if not exists
+                                    if f"edit_button_{conv['filename']}" not in st.session_state:
+                                        st.session_state[f"edit_button_{conv['filename']}"] = False
+                                    
+                                    # Edit button
                                     if st.button("✏️", key=f"edit_title_btn_{conv['filename']}", help="Edit Title"):
+                                        st.session_state[f"edit_button_{conv['filename']}"] = True
+
+                                    # Check the button state
+                                    if st.session_state[f"edit_button_{conv['filename']}"]:
                                         st.session_state.edit_title_mode = True
                                         st.session_state.edit_title_target = conv['filename']
                                         st.session_state.new_title = conv['title']
+                                        # Reset the button state
+                                        st.session_state[f"edit_button_{conv['filename']}"] = False
                                         st.rerun()
                                 with col_icon3:
                                     if st.button("🗑️", key=f"delete_{conv['filename']}", help="Delete Conversation"):
