@@ -13,6 +13,10 @@ This Streamlit app allows users to analyze images using the Ollama Vision Model,
 
 ## Setup
 
+[![Introducing a chatgpt style conversational vision model](https://github.com/user-attachments/assets/36556c62-c347-46e7-aafc-8c17657cdf46)](https://www.youtube.com/watch?v=sdulVogM2aQ)
+
+
+
 1. **Clone the repository**:
     ```bash
     git clone https://github.com/agituts/ollama-vision-model-enhanced.git
