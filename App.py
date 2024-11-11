@@ -209,6 +209,7 @@ def clear_image_state():
     st.session_state.file_uploader_key += 1
 
 def clear_all_state():
+    # Do not reset per-conversation confirmation variables here
     st.session_state.messages = []
     st.session_state.context = ""
     st.session_state.title = ""  # Reset the title
@@ -274,10 +275,6 @@ def main():
         st.session_state.file_uploader_key = 0
     if 'current_conversation_filename' not in st.session_state:
         st.session_state.current_conversation_filename = None
-    if 'delete_confirm' not in st.session_state:
-        st.session_state.delete_confirm = False
-    if 'delete_target' not in st.session_state:
-        st.session_state.delete_target = ''
     if 'delete_all_confirm' not in st.session_state:
         st.session_state.delete_all_confirm = False
     if 'load_conversation_filename' not in st.session_state:
@@ -361,6 +358,14 @@ def main():
                         with st.container():
                             st.markdown(f"<div class='conversation-item'>", unsafe_allow_html=True)
 
+                            # Unique keys for per-conversation delete confirmation
+                            confirm_key = f"delete_confirm_{conv['filename']}"
+                            target_key = f"delete_target_{conv['filename']}"
+                            if confirm_key not in st.session_state:
+                                st.session_state[confirm_key] = False
+                            if target_key not in st.session_state:
+                                st.session_state[target_key] = ''
+
                             # Display the conversation title
                             st.markdown(f"<div class='conversation-title'>{conv['title']}</div>", unsafe_allow_html=True)
 
@@ -420,25 +425,27 @@ def main():
                                         st.rerun()
                                 with col_icon3:
                                     if st.button("🗑️", key=f"delete_{conv['filename']}", help="Delete Conversation"):
-                                        st.session_state.delete_confirm = True
-                                        st.session_state.delete_target = conv['filename']
-                                        st.rerun()
+                                        st.session_state[confirm_key] = True
+                                        st.session_state[target_key] = conv['filename']
                                 st.markdown("</div>", unsafe_allow_html=True)
 
                             # Display the delete confirmation dialog
-                            if st.session_state.delete_confirm and st.session_state.delete_target == conv['filename']:
+                            if st.session_state[confirm_key] and st.session_state[target_key] == conv['filename']:
                                 st.error(f"⚠️ Confirm delete **\"{conv['title']}\"**?")
                                 col_confirm, col_cancel = st.columns(2)
                                 with col_confirm:
                                     if st.button("✅ Yes", key=f"confirm_delete_{conv['filename']}"):
-                                        delete_conversation(st.session_state.delete_target)
-                                        st.session_state.delete_confirm = False
-                                        st.session_state.delete_target = ''
+                                        delete_conversation(st.session_state[target_key])
+                                        # Check if the deleted conversation is the current one
+                                        if st.session_state.current_conversation_filename == os.path.join('conversations', st.session_state[target_key]):
+                                            clear_all_state()
+                                        st.session_state[confirm_key] = False
+                                        st.session_state[target_key] = ''
                                         st.rerun()
                                 with col_cancel:
                                     if st.button("❌ No", key=f"cancel_delete_{conv['filename']}"):
-                                        st.session_state.delete_confirm = False
-                                        st.session_state.delete_target = ''
+                                        st.session_state[confirm_key] = False
+                                        st.session_state[target_key] = ''
                                         st.rerun()
 
                             st.markdown("</div>", unsafe_allow_html=True)
