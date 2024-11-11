@@ -2,6 +2,8 @@
 
 This Streamlit app allows users to analyze images using the Ollama Vision Model, with features such as conversation management.
 
+![2024-11-11_15-53-40](https://github.com/user-attachments/assets/17292e69-3a34-47fe-b860-3986cd1e2987)
+
 ## Requirements
 
 - Python 3.x
